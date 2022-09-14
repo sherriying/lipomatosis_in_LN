@@ -1,2 +1,5 @@
 # lipomatosis_in_LN
-Pathway enrichment analysis 
+Analysis for NF-kappB signaling pathway and Hippo signaling pathway
+
+
+

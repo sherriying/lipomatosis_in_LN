@@ -48,3 +48,42 @@ heatmap_afterTrajectory4avgExpr(t(scale(t(expr.NFkappaB.avg))),heatmap_title="NF
   
 ## similar code apply to Hippo signaling pathway
 
+################################################
+## function for UMAP feature plot for scRNA-seq data from human LN
+##### (data download from PMID: 33903764) #####
+################################################
+
+marker.plot= function(markers,counts.table,embedding){
+  gene.expr.selected=counts.table[row.names(counts.table)==markers,]
+  cell.selected=names(gene.expr.selected)[which(gene.expr.selected>0)]
+  embedding.selected=embedding[cell.selected,]
+  gene.expr.cell.selected=gene.expr.selected[which(gene.expr.selected>0)]
+  gene.expr.cell.selected.lg=gene.expr.cell.selected
+  gene.expr.cell.selected.lg=as.vector(gene.expr.cell.selected.lg)
+  mi=min(gene.expr.cell.selected.lg)
+  ma=max(gene.expr.cell.selected.lg)
+  v <- round((gene.expr.cell.selected.lg- mi)/(ma - mi)*99 + 1,0)
+  gene.selected=data.frame(embedding.selected,expr=gene.expr.cell.selected,expr.modify=v)
+  p<-ggplot(embedding, aes(x=UMAP1_orig, y=UMAP2_orig)) + 
+    geom_point(size=0.3,color="grey")+
+    geom_point( data=gene.selected,mapping=aes( x=UMAP1,y=UMAP2,color=(expr.modify)),size=0.3)+
+    scale_colour_gradientn(colours = myPalette(100))+
+    theme_bw()+
+    ggtitle(markers)+
+    theme(
+      legend.position="right",
+      panel.grid.major = element_blank(), 
+      panel.grid.minor = element_blank(),
+      panel.background = element_blank(), 
+      axis.line =element_blank(),
+      panel.border = element_rect(colour = "black", fill=NA, size=1),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      plot.title = element_text(hjust = 0.5,face="italic"),
+      text = element_text(size=8)
+    )+
+    guides(color = guide_colourbar(title="",barwidth = 0.7, barheight =5))
+  print(p)
+}
+
+marker.plot(markers,counts,emb)

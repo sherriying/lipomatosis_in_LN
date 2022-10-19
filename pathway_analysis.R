@@ -1,11 +1,13 @@
+# analysis is performed using R (version 4.1.1)
 
 ############################################
 #### DEG in NF-kappB signaling pathway ####
 ############################################
 
-library(Seurat)
-library(KEGGREST)
-library(ComplexHeatmap)
+library(Seurat) # version 4.0.4 
+library(KEGGREST) # version 1.34.0
+library(ComplexHeatmap) # version 2.10.0
+library(RColorBrewer) # version 1.1-2 
 
 # identifying DEG 
 DEG<-FindMarkers(dat.seurat,ident.1="CD34+ SC",ident.2="Bst1-high",logfc.threshold = 0.5)
@@ -15,7 +17,7 @@ DEG<-DEG[DEG$p_val_adj<0.01,]
 NFkappaB.KEGG.names <- keggGet("mmu04064")[[1]]$GENE
 gene.symbols.NFkappaB<-intersect(gene.symbols.NFkappaB,row.names(DEG))
 
-# taking average gene expression
+# taking average gene expression for heatmap
 avg.expr=sapply(levels(CC.label.cell.sort),function(x){
   cell.select=names(CC.label.cell.sort[CC.label.cell.sort==x])
   cluster.avg=apply(data.norm[,cell.select],1,mean)
@@ -44,6 +46,7 @@ heatmap_afterTrajectory4avgExpr<-function(expr,heatmap_title,heatmap_col,file){
   dev.off()
 }
 
+mycolor<-colorRampPalette(rev(brewer.pal(n = 11, name ="RdYlBu")))(100)
 heatmap_afterTrajectory4avgExpr(t(scale(t(expr.NFkappaB.avg))),heatmap_title="NF-kappa B signaling pathway",heatmap_col=mycolor,file="heatmap_NFkappaB_avgExpr.pdf") 
   
 ## similar code apply to Hippo signaling pathway
